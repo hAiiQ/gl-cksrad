@@ -18,7 +18,8 @@ export function openDatabase(directory) {
       started_at INTEGER,
       duration_ms INTEGER,
       rotation REAL,
-      winner_id TEXT
+      winner_id TEXT,
+      requires_twitch INTEGER NOT NULL DEFAULT 1
     );
     CREATE TABLE IF NOT EXISTS entries (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,6 +28,9 @@ export function openDatabase(directory) {
       display_name TEXT NOT NULL,
       avatar TEXT,
       joined_at INTEGER NOT NULL,
+      twitch_id TEXT,
+      twitch_name TEXT,
+      twitch_verified_at INTEGER,
       UNIQUE(round_id, discord_id)
     );
     CREATE TABLE IF NOT EXISTS sessions (
@@ -35,8 +39,19 @@ export function openDatabase(directory) {
       expires_at INTEGER NOT NULL
     );
   `);
+  // Upgrade existing installations without changing completed/in-progress draws.
+  const roundColumns = db.prepare('PRAGMA table_info(rounds)').all().map((column) => column.name);
+  if (!roundColumns.includes('requires_twitch')) db.exec('ALTER TABLE rounds ADD COLUMN requires_twitch INTEGER NOT NULL DEFAULT 0');
+  const entryColumns = db.prepare('PRAGMA table_info(entries)').all().map((column) => column.name);
+  for (const [name, type] of [['twitch_id', 'TEXT'], ['twitch_name', 'TEXT'], ['twitch_verified_at', 'INTEGER']]) {
+    if (!entryColumns.includes(name)) db.exec(`ALTER TABLE entries ADD COLUMN ${name} ${type}`);
+  }
+  db.exec(`
+    CREATE UNIQUE INDEX IF NOT EXISTS one_twitch_per_round ON entries(round_id, twitch_id) WHERE twitch_id IS NOT NULL;
+    UPDATE rounds SET requires_twitch = 1 WHERE status = 'open';
+  `);
   if (!db.prepare('SELECT id FROM rounds LIMIT 1').get()) {
-    db.prepare('INSERT INTO rounds (created_at) VALUES (?)').run(Date.now());
+    db.prepare('INSERT INTO rounds (created_at, requires_twitch) VALUES (?, 1)').run(Date.now());
   }
   return db;
 }
@@ -92,5 +107,20 @@ export class SQLiteSessionStore extends session.Store {
       callback(null);
     } catch (error) { callback(error); }
   }
-  close() { clearInterval(this.cleanup); }
+  close() { this.closed = true; clearInterval(this.cleanup); }
+
+  async auditSessions(callback) {
+    const rows = this.db.prepare('SELECT sid, payload FROM sessions WHERE expires_at > ?').all(Date.now());
+    for (const row of rows) {
+      if (this.closed) return;
+      let value;
+      try { value = this.open(row.payload); } catch { continue; }
+      if (!value.twitchTokens) continue;
+      await callback(value);
+      if (this.closed) return;
+      // Do not overwrite a newer request or resurrect a logged-out session.
+      this.db.prepare('UPDATE sessions SET payload = ? WHERE sid = ? AND payload = ?')
+        .run(this.seal(value), row.sid, row.payload);
+    }
+  }
 }
