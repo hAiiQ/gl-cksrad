@@ -22,11 +22,3 @@ services:
         generateValue: true
       - key: ADMIN_PASSWORD
         sync: false
-      - key: DISCORD_CLIENT_ID
-        sync: false
-      - key: DISCORD_CLIENT_SECRET
-        sync: false
-      - key: TWITCH_CLIENT_ID
-        sync: false
-      - key: TWITCH_CLIENT_SECRET
-        sync: false

@@ -33,7 +33,8 @@ function element(tag, className, text) {
 }
 function avatar(target, user) {
   target.replaceChildren();
-  target.style.backgroundColor = colors[Number(BigInt(user.id) % BigInt(colors.length))];
+  const colorKey = Array.from(user.id).reduce((sum, character) => sum + character.codePointAt(0), 0);
+  target.style.backgroundColor = colors[colorKey % colors.length];
   if (user.avatar) {
     const img = document.createElement('img');
     img.src = user.avatar;
@@ -185,32 +186,6 @@ function animateDraw(round) {
   };
   frame();
 }
-function renderGuilds() {
-  $('guild-list').replaceChildren();
-  for (const guild of state.guilds) {
-    const checked = state.me?.guildIds.includes(guild.id);
-    const link = element('a', 'guild');
-    link.href = guild.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
-    link.setAttribute('aria-label', `${guild.name} ${checked ? '– Mitgliedschaft bestätigt' : guild.hasInvite ? 'beitreten' : 'auf Discord öffnen'}`);
-    const image = element('span', 'guild-icon'); image.append(icon('discord'));
-    const info = element('span', 'guild-info');
-    info.append(element('span', 'guild-name', guild.name), element('span', 'guild-id', guild.id));
-    const action = element('span', `guild-action${checked ? ' checked' : ''}`);
-    action.append(icon(checked ? 'check' : 'external'));
-    link.append(image, info, action);
-    $('guild-list').append(link);
-  }
-  const checked = state.me?.twitch?.following;
-  const link = element('a', 'guild twitch-guild');
-  link.href = state.twitch.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
-  link.setAttribute('aria-label', `${state.twitch.channel} auf Twitch ${checked ? '– Follow bestätigt' : 'folgen'}`);
-  const image = element('span', 'guild-icon'); image.append(icon('twitch'));
-  const info = element('span', 'guild-info');
-  info.append(element('span', 'guild-name', state.twitch.channel),
-    element('span', 'guild-id', checked ? `Follow bestätigt · ${state.me.twitch.name}` : 'Auf Twitch folgen'));
-  const action = element('span', `guild-action${checked ? ' checked' : ''}`); action.append(icon(checked ? 'check' : 'external'));
-  link.append(image, info, action); $('guild-list').append(link);
-}
 function renderParticipants() {
   const { entries, winner } = state.round;
   $('participants-count').textContent = entries.length;
@@ -220,7 +195,7 @@ function renderParticipants() {
       const empty = element('div', 'participants-empty');
       const image = element('span', 'empty-icon'); image.append(icon('users'));
       const text = element('div');
-      text.append(element('strong', '', 'Der erste Platz wartet auf dich.'), element('p', '', 'Melde dich an und mach den Anfang.'));
+      text.append(element('strong', '', 'Der erste Platz wartet auf dich.'), element('p', '', 'Trag deinen Namen ein und mach den Anfang.'));
       empty.append(image, text, element('span', 'empty-doodle', '↗'));
       $('participants-list').replaceChildren(empty);
     }
@@ -243,11 +218,8 @@ function renderJoin() {
   $('join-card').classList.toggle('entered', entered);
   show($('join-default'), !entered);
   show($('my-ticket'), entered);
-  show($('join-button'), !me);
-  show($('twitch-button'), me && !me.twitch && !entered && round.status === 'open');
-  show($('twitch-switch'), me?.twitch && !entered && round.status === 'open');
-  show($('participate-button'), me && me.twitch && !entered);
-  show($('logout-button'), Boolean(me));
+  show($('join-form'), !entered && round.status === 'open');
+  if (me && !$('participant-name').value) $('participant-name').value = me.name;
   if (entered) {
     $('ticket-number').textContent = String(me.ticket).padStart(3, '0');
     $('ticket-name').textContent = me.name;
@@ -258,16 +230,11 @@ function renderJoin() {
     if (round.status !== 'open') {
       defaults.querySelector('h2').textContent = round.status === 'drawing' ? 'Jetzt wird’s spannend.' : 'Neues Glück kommt bald.';
       defaults.querySelector('p').textContent = round.status === 'drawing' ? 'Die Lose sind drin. Fiebere mit!' : 'Die nächste Runde wartet schon.';
-      show($('join-button'), false); show($('participate-button'), false);
       $('join-note').replaceChildren(icon('lock'), document.createTextNode('Teilnahme für diese Runde geschlossen.'));
     } else {
       defaults.querySelector('h2').replaceChildren(document.createTextNode(me ? 'Bereit für dein ' : 'Du fehlst noch '), document.createElement('br'), document.createTextNode(me ? 'bisschen Glück?' : 'auf dem Rad.'));
       defaults.querySelector('p').textContent = me ? `Hey ${me.name}, sichere dir dein Los.` : 'Deine Community. Deine Chance.';
-      if (me && !me.twitch) defaults.querySelector('p').textContent = 'Verbinde Twitch und bestätige deinen Follow.';
-      else if (me?.twitch && !me.twitch.following) defaults.querySelector('p').textContent = 'Folge joedom auf Twitch. Dann kurz prüfen.';
-      $('join-note').replaceChildren(icon('ticket'), document.createTextNode('Kostenlos dabei · Ein Los pro Person'));
-      $('participate-button').querySelector('span').textContent = me?.guildIds.length < 2 ? 'Mitgliedschaft prüfen'
-        : !me?.twitch?.following ? 'Follow prüfen & Los sichern' : 'Los sichern';
+      $('join-note').replaceChildren(icon('ticket'), document.createTextNode('Kostenlos dabei · Ein Los pro Browser'));
     }
   }
 }
@@ -300,7 +267,7 @@ function render() {
   show($('admin-form'), !admin);
   show($('admin-logout-button'), admin);
   renderWheel(round.entries);
-  renderJoin(); renderGuilds(); renderParticipants(); animateDraw(round);
+  renderJoin(); renderParticipants(); animateDraw(round);
   if (round.winner) revealWinner(round);
 }
 function revealWinner(round) {
@@ -366,27 +333,15 @@ $('admin-logout-button').addEventListener('click', async () => {
   try { acceptState(await api('/api/admin/logout')); $('admin-dialog').close(); toast('Admin abgemeldet.'); }
   catch (error) { toast(error.message, true); }
 });
-$('join-button').addEventListener('click', (event) => {
-  if (!state?.configured) {
-    event.preventDefault();
-    toast('Der Discord-Login wird noch eingerichtet. Schau gleich wieder vorbei.', true);
-  }
-});
-$('twitch-button').addEventListener('click', (event) => {
-  if (!state?.twitch.configured) {
-    event.preventDefault();
-    toast('Die Twitch-Verifizierung wird noch eingerichtet. Schau gleich wieder vorbei.', true);
-  }
-});
-$('participate-button').addEventListener('click', async () => {
+$('participant-name').addEventListener('input', () => { $('join-error').textContent = ''; });
+$('join-form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  if ($('participate-button').disabled) return;
+  $('join-error').textContent = '';
   $('participate-button').disabled = true;
-  try { acceptState(await api('/api/participate')); toast('Dein Los ist im Lostopf. Viel Glück!'); }
-  catch (error) { toast(error.message, true); await refresh(); }
+  try { acceptState(await api('/api/participate', { name: $('participant-name').value })); toast('Dein Los ist im Lostopf. Viel Glück!'); }
+  catch (error) { $('join-error').textContent = error.message; await refresh(); }
   finally { $('participate-button').disabled = false; }
-});
-$('logout-button').addEventListener('click', async () => {
-  try { await api('/api/logout'); await refresh(); toast('Du bist abgemeldet. Dein Los bleibt dabei.'); }
-  catch (error) { toast(error.message, true); }
 });
 $('draw-button').addEventListener('click', async () => {
   if (busy) return;
@@ -415,26 +370,7 @@ $('sound-button').addEventListener('click', async () => {
   } catch { toast('Dein Browser kann den Ton gerade nicht aktivieren.', true); }
 });
 $('more-button').addEventListener('click', () => { participantLimit += 24; renderParticipants(); });
-const errors = {
-  setup: 'Der Discord-Login wird noch eingerichtet. Schau gleich wieder vorbei.',
-  state: 'Die Anmeldung ist abgelaufen. Bitte erneut versuchen.',
-  cancelled: 'Discord-Anmeldung abgebrochen. Du kannst es jederzeit erneut versuchen.',
-  discord: 'Die Discord-Anmeldung hat nicht geklappt. Bitte erneut versuchen.',
-  membership: 'Fast dabei! Tritt beiden Servern bei und prüfe deine Mitgliedschaft erneut.',
-  'auth-rate': 'Zu viele Anmeldeversuche. Bitte in 15 Minuten erneut versuchen.',
-  'discord-first': 'Bitte zuerst mit Discord anmelden. Danach kannst du Twitch verbinden.',
-  'twitch-setup': 'Die Twitch-Verifizierung wird noch eingerichtet. Schau gleich wieder vorbei.',
-  'twitch-cancelled': 'Twitch-Verifizierung abgebrochen. Du kannst es erneut versuchen.',
-  twitch: 'Die Twitch-Verifizierung hat nicht geklappt. Bitte Twitch erneut verbinden.',
-  'twitch-follow': 'Fast dabei! Folge joedom auf Twitch und prüfe den Follow erneut.',
-  'twitch-used': 'Dieses Twitch-Konto hat in dieser Runde bereits ein Los.',
-  'twitch-locked': 'Dein Los ist für diese Runde schon mit einem anderen Twitch-Konto verknüpft.',
-};
 const params = new URLSearchParams(location.search);
-if (params.has('error')) toast(errors[params.get('error')] || 'Bitte erneut versuchen.', true);
-if (params.get('joined') === '1') toast('Discord verbunden. Viel Glück!');
-if (params.get('connected') === 'discord') toast('Discord verbunden. Jetzt noch Twitch verifizieren.');
-if (params.get('connected') === 'twitch') toast('Twitch-Follow bestätigt. Deine Teilnahme wird angezeigt.');
 if (params.has('error') || params.has('joined') || params.has('connected')) history.replaceState(null, '', location.pathname + location.hash);
 
 refresh();

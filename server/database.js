@@ -18,20 +18,17 @@ export function openDatabase(directory) {
       started_at INTEGER,
       duration_ms INTEGER,
       rotation REAL,
-      winner_id TEXT,
-      requires_twitch INTEGER NOT NULL DEFAULT 1
+      winner_id TEXT
     );
     CREATE TABLE IF NOT EXISTS entries (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       round_id INTEGER NOT NULL REFERENCES rounds(id),
-      discord_id TEXT NOT NULL,
+      participant_id TEXT NOT NULL,
       display_name TEXT NOT NULL,
       avatar TEXT,
       joined_at INTEGER NOT NULL,
-      twitch_id TEXT,
-      twitch_name TEXT,
-      twitch_verified_at INTEGER,
-      UNIQUE(round_id, discord_id)
+      eligible INTEGER NOT NULL DEFAULT 1,
+      UNIQUE(round_id, participant_id)
     );
     CREATE TABLE IF NOT EXISTS sessions (
       sid TEXT PRIMARY KEY,
@@ -39,24 +36,34 @@ export function openDatabase(directory) {
       expires_at INTEGER NOT NULL
     );
   `);
-  // Upgrade existing installations without changing completed/in-progress draws.
-  const roundColumns = db.prepare('PRAGMA table_info(rounds)').all().map((column) => column.name);
-  if (!roundColumns.includes('requires_twitch')) db.exec('ALTER TABLE rounds ADD COLUMN requires_twitch INTEGER NOT NULL DEFAULT 0');
+  // Preserve previous participants and the exact participant set of historical draws.
+  db.exec('BEGIN IMMEDIATE');
+  try {
   const entryColumns = db.prepare('PRAGMA table_info(entries)').all().map((column) => column.name);
-  for (const [name, type] of [['twitch_id', 'TEXT'], ['twitch_name', 'TEXT'], ['twitch_verified_at', 'INTEGER']]) {
-    if (!entryColumns.includes(name)) db.exec(`ALTER TABLE entries ADD COLUMN ${name} ${type}`);
+  if (entryColumns.includes('discord_id') && !entryColumns.includes('participant_id')) {
+    db.exec('ALTER TABLE entries RENAME COLUMN discord_id TO participant_id');
   }
-  db.exec(`
-    CREATE UNIQUE INDEX IF NOT EXISTS one_twitch_per_round ON entries(round_id, twitch_id) WHERE twitch_id IS NOT NULL;
-    UPDATE rounds SET requires_twitch = 1 WHERE status = 'open';
-  `);
+  if (!entryColumns.includes('eligible')) {
+    db.exec('ALTER TABLE entries ADD COLUMN eligible INTEGER NOT NULL DEFAULT 1');
+    const roundColumns = db.prepare('PRAGMA table_info(rounds)').all().map((column) => column.name);
+    if (roundColumns.includes('requires_twitch') && entryColumns.includes('twitch_id') && entryColumns.includes('twitch_verified_at')) {
+      db.exec(`UPDATE entries SET eligible = 0 WHERE (twitch_id IS NULL OR twitch_verified_at IS NULL)
+        AND round_id IN (SELECT id FROM rounds WHERE status != 'open' AND requires_twitch = 1)`);
+    }
+  }
+  db.exec('COMMIT');
+  } catch (error) {
+    db.exec('ROLLBACK');
+    db.close();
+    throw error;
+  }
   if (!db.prepare('SELECT id FROM rounds LIMIT 1').get()) {
-    db.prepare('INSERT INTO rounds (created_at, requires_twitch) VALUES (?, 1)').run(Date.now());
+    db.prepare('INSERT INTO rounds (created_at) VALUES (?)').run(Date.now());
   }
   return db;
 }
 
-// OAuth tokens stay on the server. Session payloads are encrypted at rest.
+// Admin session payloads are encrypted at rest.
 export class SQLiteSessionStore extends session.Store {
   constructor(db, secret) {
     super();
@@ -107,20 +114,5 @@ export class SQLiteSessionStore extends session.Store {
       callback(null);
     } catch (error) { callback(error); }
   }
-  close() { this.closed = true; clearInterval(this.cleanup); }
-
-  async auditSessions(callback) {
-    const rows = this.db.prepare('SELECT sid, payload FROM sessions WHERE expires_at > ?').all(Date.now());
-    for (const row of rows) {
-      if (this.closed) return;
-      let value;
-      try { value = this.open(row.payload); } catch { continue; }
-      if (!value.twitchTokens) continue;
-      await callback(value);
-      if (this.closed) return;
-      // Do not overwrite a newer request or resurrect a logged-out session.
-      this.db.prepare('UPDATE sessions SET payload = ? WHERE sid = ? AND payload = ?')
-        .run(this.seal(value), row.sid, row.payload);
-    }
-  }
+  close() { clearInterval(this.cleanup); }
 }

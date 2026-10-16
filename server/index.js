@@ -14,21 +14,11 @@ const config = {
   production, appUrl,
   sessionSecret: process.env.SESSION_SECRET || randomBytes(48).toString('hex'),
   adminPassword: process.env.ADMIN_PASSWORD,
-  clientId: process.env.DISCORD_CLIENT_ID || '',
-  clientSecret: process.env.DISCORD_CLIENT_SECRET || '',
-  callbackUrl: `${appUrl}/auth/discord/callback`,
-  twitchClientId: process.env.TWITCH_CLIENT_ID || '',
-  twitchClientSecret: process.env.TWITCH_CLIENT_SECRET || '',
-  twitchCallbackUrl: `${appUrl}/auth/twitch/callback`,
   dataDir: process.env.DATA_DIR || './data',
-  guildNames: [process.env.DISCORD_GUILD_1_NAME || 'Herbi Community', process.env.DISCORD_GUILD_2_NAME || 'Partner Community'],
-  guildInvites: [process.env.DISCORD_GUILD_1_INVITE || '', process.env.DISCORD_GUILD_2_INVITE || ''],
 };
 const instance = createApp(config);
 const server = instance.app.listen(port, '0.0.0.0', () => {
   console.log(`Glücksrad läuft auf ${appUrl}`);
-  if (!config.clientId || !config.clientSecret) console.log('Discord: Client-ID und Client-Secret noch in den Umgebungsvariablen eintragen.');
-  if (!config.twitchClientId || !config.twitchClientSecret) console.log('Twitch: Client-ID und Client-Secret noch in den Umgebungsvariablen eintragen.');
 });
 function shutdown() {
   server.close(() => { instance.close(); process.exit(0); });
