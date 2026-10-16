@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f7f8f2">
+  <meta name="description" content="Deine Community. Dein Los. Dein Glück. Sei beim Herbi Community-Gewinnspiel dabei.">
+  <title>herbi — Dein Los. Dein Glück.</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <svg class="icon-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-clover" viewBox="0 0 32 32"><path d="M16 16C-1 14 6-5 16 7C26-5 33 14 16 16C33 18 26 37 16 25C6 37-1 18 16 16Z" fill="currentColor"/></symbol>
+    <symbol id="i-discord" viewBox="0 0 24 24"><path d="M19.8 5.5a19 19 0 0 0-4.6-1.4l-.6 1.2a16.9 16.9 0 0 0-5.2 0l-.6-1.2a19 19 0 0 0-4.6 1.4C1.3 9.8.5 14 .9 18.1a18.4 18.4 0 0 0 5.7 2.8l1.2-1.9-1.9-.9.5-.4a13.3 13.3 0 0 0 11.2 0l.5.4-1.9.9 1.2 1.9a18.4 18.4 0 0 0 5.7-2.8c.5-4.8-.9-9-3.3-12.6ZM8.3 15.6c-1.1 0-2-1-2-2.3s.9-2.3 2-2.3c1.1 0 2 1 2 2.3s-.9 2.3-2 2.3Zm7.4 0c-1.1 0-2-1-2-2.3s.9-2.3 2-2.3c1.1 0 2 1 2 2.3s-.9 2.3-2 2.3Z" fill="currentColor"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6m2 3a6 6 0 0 1 3 5"/></symbol>
+    <symbol id="i-ticket" viewBox="0 0 24 24"><path d="M3 5h18v5a2 2 0 0 0 0 4v5H3v-5a2 2 0 0 0 0-4V5Zm12 0v3m0 3v2m0 3v3"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5L12 2Z"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="m11 5-6 4H2v6h3l6 4V5Zm4 3a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></symbol>
+    <symbol id="i-muted" viewBox="0 0 24 24"><path d="m11 5-6 4H2v6h3l6 4V5Zm5 4 6 6m0-6-6 6"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7 3h10v6a5 5 0 0 1-10 0V3Zm0 2H3v3a4 4 0 0 0 4 4m10-7h4v3a4 4 0 0 1-4 4m-5 2v5m-5 2h10m-8 0v-2h6v2"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5m-4-4a8 8 0 0 1 13-3l2 3M4 16l2 3a8 8 0 0 0 13-3"/></symbol>
+    <symbol id="i-out" viewBox="0 0 24 24"><path d="M9 4H4v16h5m6-13 5 5-5 5M8 12h12"/></symbol>
+  </svg>
+
+  <header class="header wrap">
+    <a class="brand" href="/" aria-label="herbi Startseite"><span class="brand-icon"><svg><use href="#i-clover"/></svg></span><span>herbi<span class="brand-period">.</span></span></a>
+    <nav aria-label="Hauptnavigation"><a class="nav-active" href="#gluecksrad">Glücksrad<span></span></a><button class="nav-link" id="how-button">So funktioniert’s <svg class="icon"><use href="#i-external"/></svg></button></nav>
+    <div class="header-actions"><span class="connection" id="connection"><span class="live-dot"></span>Live verbunden</span><button class="admin-link" id="admin-button"><svg class="icon"><use href="#i-lock"/></svg><span>Admin</span></button><button id="logout-button" class="icon-button hidden" aria-label="Abmelden" title="Abmelden"><svg class="icon"><use href="#i-out"/></svg></button></div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero" aria-labelledby="page-title">
+      <div><div class="eyebrow"><span class="mini-line"></span> DEIN COMMUNITY-GEWINNSPIEL</div><h1 id="page-title">Dein Los. <span>Dein Glück<svg class="heading-spark" viewBox="0 0 35 38" aria-hidden="true"><path d="m17 1 3 13 13 4-13 4-3 14-4-14L1 18l12-4Z"/></svg>.</span></h1><p>Einmal anmelden. Ein Los sichern. Gemeinsam mitfiebern.</p></div>
+      <div class="hero-art" aria-hidden="true"><span class="art-note">Kleines Los, großes Vielleicht.</span><svg class="art-doodle" viewBox="0 0 90 50"><path d="M5 8c33-11 53 4 48 20s-31 8-20-3 41-2 49 14m-15-2 15 2-2-13"/></svg><div class="art-ticket"><span>GOOD THINGS<br>ARE COMING.</span><svg><use href="#i-clover"/></svg><div class="ticket-dashes"></div><span class="art-number">№ 001</span></div><span class="art-star">✳</span></div>
+    </section>
+
+    <div class="main-grid" id="gluecksrad">
+      <section class="wheel-card" aria-labelledby="wheel-title">
+        <div class="card-top"><div class="card-title"><span class="small-square"><svg class="icon"><use href="#i-clover"/></svg></span><h2 id="wheel-title">Das Glücksrad</h2></div><span class="status-pill" id="round-status"><span class="live-dot"></span>Teilnahme offen</span></div>
+        <div class="wheel-scene">
+          <span class="scene-spark spark-one" aria-hidden="true">✳</span><span class="scene-spark spark-two" aria-hidden="true">✧</span><span class="scene-spark spark-three" aria-hidden="true">+</span>
+          <div class="wheel-shell"><div class="wheel-pointer" aria-hidden="true"><svg viewBox="0 0 36 47"><path d="M3 4C3 1 33 1 33 4v15c0 5-15 24-15 24S3 24 3 19Z" fill="#243d34"/><circle cx="18" cy="14" r="4" fill="#d4eeaa"/></svg></div><div class="wheel-ring"><svg id="wheel" viewBox="0 0 500 500" role="img" aria-label="Glücksrad – noch keine Teilnehmer"></svg></div><div class="wheel-hub" aria-hidden="true"><svg><use href="#i-clover"/></svg><span>herbi.</span><span class="hub-caption">GOOD LUCK</span></div></div>
+        </div>
+        <div class="wheel-caption" aria-live="polite"><span class="caption-label" id="wheel-caption"><svg class="icon"><use href="#i-lock"/></svg>Das Glück wartet auf dich</span><p id="wheel-subtitle">Sichere dir deinen Platz auf dem Rad.</p></div>
+        <div id="admin-controls" class="admin-controls hidden"><span><svg class="icon"><use href="#i-lock"/></svg> Du bist Admin</span><button class="button button-dark" id="draw-button"><svg class="icon"><use href="#i-refresh"/></svg>Glücksrad starten</button><button class="button button-dark hidden" id="new-round-button">Neue Runde <svg class="icon"><use href="#i-arrow"/></svg></button></div>
+        <div class="wheel-bottom"><span><svg class="icon"><use href="#i-users"/></svg><strong id="wheel-count">0</strong> Teilnehmer</span><span class="equal-chance"><svg class="icon"><use href="#i-ticket"/></svg>1 Person = 1 Los</span><button class="sound-button" id="sound-button" aria-label="Ton einschalten" aria-pressed="false" title="Ton einschalten"><svg class="icon"><use href="#i-muted"/></svg></button></div>
+      </section>
+
+      <aside class="sidebar" aria-label="Deine Teilnahme">
+        <section class="join-card" id="join-card">
+          <div class="join-top"><span class="eyebrow">DEIN GLÜCK BEGINNT HIER</span><svg class="join-spark"><use href="#i-spark"/></svg></div>
+          <div id="join-default"><h2>Du fehlst noch<br>auf dem Rad.</h2><p>Deine Community. Deine Chance.</p></div>
+          <div class="hidden" id="my-ticket"><span class="ticket-label">DEIN LOS FÜR DIESE RUNDE</span><div class="my-ticket-number"><span id="ticket-number">001</span><svg><use href="#i-clover"/></svg></div><div class="ticket-user"><span id="ticket-avatar" class="avatar"></span><span id="ticket-name"></span><span class="verified-mark"><svg class="icon"><use href="#i-check"/></svg></span></div></div>
+          <a class="button button-dark join-button" href="/auth/discord" id="join-button"><svg class="icon discord-icon"><use href="#i-discord"/></svg><span>Mit Discord teilnehmen</span><svg class="icon"><use href="#i-arrow"/></svg></a>
+          <button class="button button-dark join-button hidden" id="participate-button"><svg class="icon"><use href="#i-ticket"/></svg><span>Los sichern</span><svg class="icon"><use href="#i-arrow"/></svg></button>
+          <div class="join-note" id="join-note"><svg class="icon"><use href="#i-ticket"/></svg>Kostenlos dabei · Ein Los pro Person</div>
+        </section>
+
+        <section class="community-card"><div class="section-kicker">KLEINER CHECK, DANN GEHT’S LOS</div><h2>Zwei Server. Ein Ticket.</h2><p>Sei in beiden Communitys dabei.</p><div id="guild-list" class="guild-list"></div><div class="check-hint"><svg class="icon"><use href="#i-lock"/></svg>Wird bei deiner Teilnahme geprüft.</div></section>
+        <div class="fair-note"><span class="fair-icon"><svg class="icon"><use href="#i-spark"/></svg></span><div><strong>Gleiche Chance für alle.</strong><p>Ein Konto. Ein Los. Eine faire Ziehung.</p></div></div>
+      </aside>
+    </div>
+
+    <section class="participants-section" aria-labelledby="participants-title"><div class="participants-heading"><h2 id="participants-title">Mit im Lostopf <span id="participants-count">0</span></h2><span><span class="live-dot"></span>Live aktualisiert</span></div><div class="participants-grid" id="participants-list"><div class="participants-empty"><span class="empty-icon"><svg class="icon"><use href="#i-users"/></svg></span><div><strong>Der erste Platz wartet auf dich.</strong><p>Melde dich an und mach den Anfang.</p></div><span class="empty-doodle" aria-hidden="true">↗</span></div></div><button id="more-button" class="text-button hidden">Weitere Teilnehmer anzeigen <svg class="icon"><use href="#i-arrow"/></svg></button></section>
+  </main>
+  <footer class="footer wrap"><span class="footer-brand"><svg class="icon"><use href="#i-clover"/></svg>Ein bisschen Glück. Viel Community.</span><span>Made for good moments<span class="footer-star">✳</span></span></footer>
+
+  <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
+  <dialog id="admin-dialog" class="modal"><button class="modal-close icon-button" data-close aria-label="Schließen"><svg class="icon"><use href="#i-close"/></svg></button><div class="modal-emblem"><svg class="icon"><use href="#i-lock"/></svg></div><span class="eyebrow">NUR FÜR DEN HOST</span><h2>Dein Rad. Dein Start.</h2><p>Ein Passwort, dann kann’s losgehen.</p><form id="admin-form"><label for="admin-password">Admin-Passwort</label><div class="password-field"><input type="password" id="admin-password" name="password" placeholder="Passwort eingeben" required autocomplete="current-password" maxlength="256"><button type="button" class="text-button" id="password-toggle" aria-label="Passwort anzeigen">Zeigen</button></div><p id="admin-error" class="form-error" role="alert"></p><button class="button button-dark" type="submit">Als Admin anmelden<svg class="icon"><use href="#i-arrow"/></svg></button></form><button class="button button-light hidden" id="admin-logout-button">Admin abmelden</button></dialog>
+  <dialog id="how-dialog" class="modal how-modal"><button class="modal-close icon-button" data-close aria-label="Schließen"><svg class="icon"><use href="#i-close"/></svg></button><div class="modal-emblem"><svg class="icon"><use href="#i-clover"/></svg></div><span class="eyebrow">SO EINFACH GEHT’S</span><h2>Drei Schritte zum Glück.</h2><ol class="how-steps"><li><span>01</span><div><strong>Mit Discord anmelden.</strong><p>Wir prüfen, ob du in beiden Servern bist.</p></div></li><li><span>02</span><div><strong>Dein Los ist dabei.</strong><p>Ein Discord-Konto bekommt ein Los pro Runde.</p></div></li><li><span>03</span><div><strong>Mitfiebern & Glück haben.</strong><p>Der Admin startet. Alle sehen die Ziehung live.</p></div></li></ol><button class="button button-dark" data-close>Alles klar<svg class="icon"><use href="#i-check"/></svg></button></dialog>
+  <dialog id="winner-dialog" class="modal winner-modal"><button class="modal-close icon-button" data-close aria-label="Schließen"><svg class="icon"><use href="#i-close"/></svg></button><div class="winner-decoration" aria-hidden="true">✳</div><div class="modal-emblem"><svg class="icon"><use href="#i-trophy"/></svg></div><span class="eyebrow">DAS GLÜCK HAT ENTSCHIEDEN</span><h2>Das ist dein Moment!</h2><div id="winner-avatar" class="winner-avatar avatar"></div><strong id="winner-name" class="winner-name"></strong><p id="winner-description"></p><button class="button button-dark" data-close>Glückwunsch!<svg class="icon"><use href="#i-spark"/></svg></button></dialog>
+  <dialog id="new-round-dialog" class="modal"><button class="modal-close icon-button" data-close aria-label="Schließen"><svg class="icon"><use href="#i-close"/></svg></button><div class="modal-emblem"><svg class="icon"><use href="#i-refresh"/></svg></div><h2>Neues Spiel, neues Glück.</h2><p>Die nächste Runde startet mit einem leeren Rad. Alle können sich wieder ein Los sichern.</p><button class="button button-dark" id="confirm-round-button">Neue Runde öffnen<svg class="icon"><use href="#i-arrow"/></svg></button></dialog>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+  <noscript><div class="noscript">Bitte aktiviere JavaScript, um am Glücksrad teilzunehmen.</div></noscript>
+</body>
+</html>
